@@ -29,17 +29,23 @@ if (import.meta.env.DEV) {
 
   if (!url || !anonKey) {
     const missing = [];
-    if (!url) missing.push("VITE_SUPABASE_URL");
-    if (!anonKey) missing.push("VITE_SUPABASE_ANON_KEY");
+    if (!url) missing.push("VITE_SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL)");
+    if (!anonKey) missing.push("VITE_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)");
     const errorMsg = `[CampusConnect] Missing required environment variable(s): ${missing.join(", ")}. Please check your .env.local file.`;
     console.error(`❌ ${errorMsg}`);
     throw new Error(errorMsg);
   }
 
+  let isValid = false;
   try {
-    new URL(url);
+    const parsedUrl = new URL(url);
+    isValid = parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
   } catch (err) {
-    const errorMsg = `[CampusConnect] Invalid VITE_SUPABASE_URL: "${url}". Please check your .env.local file.`;
+    // URL parsing failed
+  }
+
+  if (!isValid) {
+    const errorMsg = `[CampusConnect] Invalid Supabase URL: "${url}". Please check your VITE_SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) in .env.local and make sure it is a valid HTTP or HTTPS URL.`;
     console.error(`❌ ${errorMsg}`);
     throw new Error(errorMsg);
   }
