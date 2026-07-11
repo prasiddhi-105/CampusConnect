@@ -105,11 +105,10 @@ function Certificates() {
                     <button
                       onClick={async () => {
                         setOpeningId(c.id);
-                        try {
-                          window.open(c.certificate_url, "_blank");
-                        } finally {
-                          setOpeningId(null);
-                        }
+                        const minDuration = new Promise((resolve) => setTimeout(resolve, 400));
+                        window.open(c.certificate_url, "_blank");
+                        await minDuration;
+                        setOpeningId(null);
                       }}
                       disabled={openingId === c.id}
                       className="neu-border neu-press flex-1 bg-black px-3 py-2 font-mono text-xs font-bold uppercase text-cream disabled:opacity-50"
