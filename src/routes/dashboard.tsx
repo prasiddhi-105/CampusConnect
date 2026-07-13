@@ -132,7 +132,7 @@ function Dashboard() {
                         <p className="font-mono text-xs">{c?.name}</p>
                       </div>
                       {/* ✨ Replaced the raw HTML button with our unified Button component */}
-                      <Button 
+                      <Button
                         variant="outline"
                         size="sm"
                         className="neu-border shrink-0 bg-white px-3 py-1 font-mono text-xs font-bold uppercase"
