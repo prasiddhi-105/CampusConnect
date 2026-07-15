@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
+
+import { useEffect, useRef, useState } from "react";
+
 import { SiteShell } from "@/components/site/SiteShell";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { useRef, useState } from "react";
 import { Plus, UsersRound, X } from "lucide-react";
 
 export const Route = createFileRoute("/clubs/")({
@@ -22,8 +25,10 @@ const ITEMS_PER_PAGE = 12;
 
 function ClubsIndex() {
   const supabase = createClient();
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
 
   // Switch to useInfiniteQuery for chunk-by-chunk data loading
   const {
@@ -33,6 +38,16 @@ function ClubsIndex() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+  const { data: clubs = [], isLoading } = useQuery({
+
     queryKey: ["clubs"],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
@@ -86,15 +101,16 @@ function ClubsIndex() {
           <div className="relative mt-6 max-w-xl">
             <input
               ref={inputRef}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search clubs by name or interest..."
               className="neu-border w-full bg-white px-4 py-3 pr-10 font-mono text-sm outline-none"
             />
-            {search && (
+            {searchInput && (
               <button
                 type="button"
                 onClick={() => {
+                  setSearchInput("");
                   setSearch("");
                   inputRef.current?.focus();
                 }}
@@ -193,6 +209,38 @@ function ClubsIndex() {
                 {isFetchingNextPage ? "Loading more..." : "Load More Clubs"}
               </button>
             </div>
+
+
+          ) : (
+            filteredClubs.map((c, index) => {
+              const members = Array.isArray(c.club_members) ? c.club_members.length : 0;
+              return (
+                <Link
+                  key={c.slug}
+                  to="/clubs/$slug"
+                  params={{ slug: c.slug }}
+                  className="neu-border group block bg-white p-6 shadow-[4px_4px_0_0_#000] transition-all duration-300 ease-in-out hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0_0_#000]"
+                >
+                  <div
+                    className={`neu-border ${colors[index % colors.length]} mb-4 inline-block px-3 py-1 font-mono text-xs font-bold uppercase`}
+                  >
+                    Club
+                  </div>
+                  <h2 className="text-2xl font-bold">{c.name}</h2>
+                  <div className="my-3 border-t-2 border-black" />
+                  <div className="flex items-center justify-between font-mono text-xs">
+                    <span>{members} members</span>
+                    <span className="font-bold uppercase flex items-center gap-1">
+                      View{" "}
+                      <span className="transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </span>
+                  </div>
+                </Link>
+              );
+            })
+
           )}
         </div>
       </section>
