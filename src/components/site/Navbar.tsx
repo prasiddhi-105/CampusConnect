@@ -46,8 +46,6 @@ export function Navbar() {
         </Link>
         <nav aria-label="Main navigation" className="hidden items-center gap-6 md:flex">
           {links.map((l) => {
-            const isActive = currentPath === l.to || currentPath.startsWith(l.to + "/");
-
             const isActive =
               (l.to as string) === "/"
                 ? currentPath === "/"
