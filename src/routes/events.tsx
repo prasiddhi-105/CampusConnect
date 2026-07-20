@@ -72,7 +72,6 @@ export default function EventsPage() {
 
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState("All");
 
   const {
     data: queryData,
